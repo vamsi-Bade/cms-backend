@@ -2,11 +2,13 @@ const mongoose = require("mongoose");
 
 const notificationModel = mongoose.Schema(
   {
-    notificationHeading: { type: String, trim: true },
-    notificationDetails: { type: String, trim: true },
-    pdf: {
-      type: "String",
-    },
+    emailId: { type: String, trim: true },
+    notifications: [
+      {
+        notificationTitle: { type: String, trim: true },
+        href: { type: String, trim: true },
+      },
+    ],
   },
   { timestamps: true }
 );
