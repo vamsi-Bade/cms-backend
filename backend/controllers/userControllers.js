@@ -23,9 +23,9 @@ const allUsers = asyncHandler(async (req, res) => {
 //@route           POST /api/user/
 //@access          Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, pic, companyName } = req.body;
+  const { name, email, password, pic, companyName, phone } = req.body;
 
-  if (!name || !email || !password || !companyName) {
+  if (!name || !email || !password || !companyName || !phone) {
     res.status(400);
     throw new Error("Please Enter all the Feilds");
   }
@@ -36,13 +36,15 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("User already exists");
   }
-
   const user = await User.create({
-    name,
-    email,
-    password,
-    pic,
-    companyName,
+    name: name,
+    email: email,
+    password: password,
+    pic: pic,
+    companyName: companyName,
+    phone: phone,
+    status: "active",
+    role: "user",
   });
 
   if (user) {
@@ -51,7 +53,9 @@ const registerUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       companyName: user.companyName,
-      isAdmin: user.isAdmin,
+      phone: user.phone,
+      role: user.role,
+      status: user.status,
       pic: user.pic,
       token: generateToken(user._id),
     });
@@ -68,16 +72,16 @@ const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       companyName: user.companyName,
-      isAdmin: user.isAdmin,
+      phone: user.phone,
       pic: user.pic,
       token: generateToken(user._id),
+      role: user.role,
     });
   } else {
     res.status(401);
@@ -85,4 +89,36 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { allUsers, registerUser, authUser };
+const getUsers = asyncHandler(async (req, res) => {
+  try {
+    User.find({}).then((users) => res.json(users));
+  } catch (err) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+const editUser = asyncHandler(async (req, res) => {
+  try {
+    const { name, emailId, phone, status, role, companyName, password } =
+      req.body.params;
+
+    const user = await User.findOne({ email: emailId });
+    user.name = name;
+    user.phone = phone;
+    user.status = status;
+    user.role = role;
+    user.email = emailId;
+    user.companyName = companyName;
+
+    if (password) {
+      user.password = password;
+    }
+    user.save();
+    res.json(user);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+module.exports = { allUsers, registerUser, authUser, getUsers, editUser };
