@@ -7,14 +7,15 @@ const userSchema = mongoose.Schema(
     email: { type: "String", unique: true, required: true },
     password: { type: "String", required: true },
     companyName: { type: "String", required: true },
+    phone: { type: "String", required: true },
+    status: { type: "String", required: true },
     pic: {
       type: "String",
-      required: true,
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
-    isAdmin: {
-      type: Boolean,
+    role: {
+      type: String,
       required: true,
       default: false,
     },
@@ -27,8 +28,8 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified) {
-    next();
+  if (!this.isModified("password")) {
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
