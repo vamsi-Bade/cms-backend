@@ -18,6 +18,10 @@ const serviceSchema = new Schema(
       type: String,
       required: true,
     },
+    status: {
+      type: String,
+      trim: true,
+    },
   },
   { _id: false }
 );

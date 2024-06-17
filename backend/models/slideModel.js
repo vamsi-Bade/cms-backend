@@ -1,20 +1,22 @@
 const mongoose = require("mongoose");
-
+const imageSchema = new mongoose.Schema({
+  imageId: {
+    type: String,
+    trim: true,
+  },
+  status: {
+    type: String,
+    trim: true,
+  },
+});
 const slideModel = mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    imageIds: [
-      {
-        type: String,
-        trim: true,
-        default:
-          "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-      },
-    ],
     emailId: {
       type: String,
       trim: true,
     },
+    images: [imageSchema],
   },
   { timestamps: true }
 );

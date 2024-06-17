@@ -7,6 +7,10 @@ const notificationModel = mongoose.Schema(
       {
         notificationTitle: { type: String, trim: true },
         href: { type: String, trim: true },
+        status: {
+          type: String,
+          trim: true,
+        },
       },
     ],
   },
