@@ -19,9 +19,13 @@ const createSlide = asyncHandler(async (req, res) => {
     if (!slide) {
       slide = new Slide({ user: userId });
     }
-
-    // Update imageIds array
-    slide.imageIds.push(...imageIds);
+    const images = imageIds.map((imageUrl) => {
+      return {
+        imageId: imageUrl,
+        status: "active",
+      };
+    });
+    slide.images.push(...images);
     slide.emailId = email;
     // Save the slide
     await slide.save();
@@ -44,14 +48,30 @@ const getSlides = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
+const changeStatus = asyncHandler(async (req, res) => {
+  try {
+    const { imageUrl, emailId, status } = req.body.params;
 
+    let slide = await Slide.findOne({ emailId: emailId });
+
+    const index = slide.images.findIndex((x) => {
+      return x.imageId == imageUrl;
+    });
+    slide.images.at(index).status = status;
+    slide.save();
+    res.json(200);
+  } catch (err) {
+    res.json(400);
+    throw new Error(err.message);
+  }
+});
 const deleteSlide = asyncHandler(async (req, res) => {
   try {
     const { imageUrl, emailId } = req.body.params;
     let slide = await Slide.findOne({ emailId: emailId });
 
-    const newArr = slide.imageIds.filter((e) => e !== imageUrl);
-    slide.imageIds = newArr;
+    const newArr = slide.images.filter((e) => e.imageId !== imageUrl);
+    slide.images = newArr;
 
     slide.save();
 
@@ -64,4 +84,4 @@ const deleteSlide = asyncHandler(async (req, res) => {
     throw new Error(err.message);
   }
 });
-module.exports = { createSlide, getSlides, deleteSlide };
+module.exports = { createSlide, getSlides, deleteSlide, changeStatus };

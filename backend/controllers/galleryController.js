@@ -20,9 +20,14 @@ const createGallery = asyncHandler(async (req, res) => {
     if (!gallery) {
       gallery = new Gallery({ user: userId });
     }
-
+    const images = imageIds.map((imageUrl) => {
+      return {
+        imageId: imageUrl,
+        status: "active",
+      };
+    });
     // Update imageIds array
-    gallery.imageIds.push(...imageIds);
+    gallery.images.push(...images);
     gallery.emailId = email;
     // Save the gallery
     await gallery.save();
@@ -35,11 +40,27 @@ const createGallery = asyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
+const changeStatus = asyncHandler(async (req, res) => {
+  try {
+    const { imageUrl, emailId, status } = req.body.params;
 
+    let gallery = await Gallery.findOne({ emailId: emailId });
+
+    const index = gallery.images.findIndex((x) => {
+      return x.imageId == imageUrl;
+    });
+    gallery.images.at(index).status = status;
+    gallery.save();
+    res.json(200);
+  } catch (err) {
+    res.json(400);
+    throw new Error(err.message);
+  }
+});
 const getGallerys = asyncHandler(async (req, res) => {
   try {
     const email = req.query.email;
-    Gallery.findOne({ emailId: email }).then((gallerys) => res.json(gallerys));
+    Gallery.findOne({ emailId: email }).then((gallery) => res.json(gallery));
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
@@ -49,8 +70,8 @@ const deleteGallery = asyncHandler(async (req, res) => {
   try {
     const { imageUrl, emailId } = req.body.params;
     let gallery = await Gallery.findOne({ emailId: emailId });
-    const newArr = gallery.imageIds.filter((e) => e !== imageUrl);
-    gallery.imageIds = newArr;
+    const newArr = gallery.images.filter((e) => e.imageId !== imageUrl);
+    gallery.images = newArr;
 
     gallery.save();
 
@@ -63,4 +84,4 @@ const deleteGallery = asyncHandler(async (req, res) => {
     throw new Error(err.message);
   }
 });
-module.exports = { createGallery, getGallerys, deleteGallery };
+module.exports = { createGallery, getGallerys, deleteGallery, changeStatus };

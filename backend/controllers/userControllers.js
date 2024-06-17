@@ -14,7 +14,6 @@ const allUsers = asyncHandler(async (req, res) => {
         ],
       }
     : {};
-
   const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
   res.send(users);
 });
@@ -73,6 +72,9 @@ const authUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
   if (user && (await user.matchPassword(password))) {
+    if (user.status == "inActive") {
+      res.status(401).send("You are Inactive");
+    }
     res.json({
       _id: user._id,
       name: user.name,
@@ -84,7 +86,7 @@ const authUser = asyncHandler(async (req, res) => {
       role: user.role,
     });
   } else {
-    res.status(401);
+    res.status(401).send("Invalid Email or Password");
     throw new Error("Invalid Email or Password");
   }
 });
