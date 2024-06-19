@@ -3,7 +3,8 @@ const asyncHandler = require("express-async-handler");
 const Blog = require("../models/blogModel.js");
 
 const createBlog = asyncHandler(async (req, res) => {
-  const { blogTitle, blogContent, imageId, emailId, shortDesc } = req.body;
+  const { blogTitle, blogContent, imageId, emailId, shortDesc, status } =
+    req.body;
 
   if (!blogTitle || !blogContent || !imageId || !shortDesc) {
     res.status(400);
@@ -18,6 +19,7 @@ const createBlog = asyncHandler(async (req, res) => {
             blogContent: blogContent,
             imageId: imageId,
             shortDesc: shortDesc,
+            status: "active",
           });
 
           return blog.save();
@@ -27,6 +29,7 @@ const createBlog = asyncHandler(async (req, res) => {
             blogContent: blogContent,
             imageId: imageId,
             shortDesc: shortDesc,
+            status: "active",
           };
           return Blog.create({ emailId: emailId, blogs: [blogData] });
         }
@@ -39,7 +42,20 @@ const createBlog = asyncHandler(async (req, res) => {
     res.json(err);
   }
 });
+const changeStatus = asyncHandler(async (req, res) => {
+  try {
+    const { index, emailId, status } = req.body.params;
 
+    let blog = await Blog.findOne({ emailId: emailId });
+
+    blog.blogs.at(index).status = status;
+    await blog.save();
+    res.json(200);
+  } catch (err) {
+    res.json(400);
+    throw new Error(err.message);
+  }
+});
 const getBlogs = asyncHandler(async (req, res) => {
   const emailId = req.query.emailId;
   try {
@@ -52,7 +68,7 @@ const deleteBlog = asyncHandler(async (req, res) => {
   const { blogId, emailId } = req.body;
   try {
     let blog = await Blog.findOne({ emailId: emailId });
-    blog.blogs.splice(blogId + 1, 1);
+    blog.blogs.splice(blogId, 1);
     blog.save();
     res
       .status(200)
@@ -63,4 +79,4 @@ const deleteBlog = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createBlog, getBlogs, deleteBlog };
+module.exports = { createBlog, getBlogs, deleteBlog, changeStatus };

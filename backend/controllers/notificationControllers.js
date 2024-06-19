@@ -17,6 +17,7 @@ const createNotification = asyncHandler(async (req, res) => {
           notification.notifications.push({
             notificationTitle: notificationTitle,
             href: href,
+            status: "active",
           });
 
           return notification.save();
@@ -24,10 +25,11 @@ const createNotification = asyncHandler(async (req, res) => {
           const notificationData = {
             notificationTitle: notificationTitle,
             href: href,
+            status: "active",
           };
           return Notification.create({
             emailId: emailId,
-            blogs: [notificationData],
+            notifications: [notificationData],
           });
         }
       })
@@ -37,6 +39,20 @@ const createNotification = asyncHandler(async (req, res) => {
   } catch (err) {
     console.log(err);
     res.json(err);
+  }
+});
+const changeStatus = asyncHandler(async (req, res) => {
+  try {
+    const { index, emailId, status } = req.body.params;
+
+    let notification = await Notification.findOne({ emailId: emailId });
+
+    notification.notifications.at(index).status = status;
+    await notification.save();
+    res.json(200);
+  } catch (err) {
+    res.json(400);
+    throw new Error(err.message);
   }
 });
 
@@ -55,7 +71,7 @@ const deleteNotification = asyncHandler(async (req, res) => {
   const { notificationId, emailId } = req.body;
   try {
     let notification = await Notification.findOne({ emailId: emailId });
-    notification.notifications.splice(notificationId + 1, 1);
+    notification.notifications.splice(notificationId, 1);
     notification.save();
     res
       .status(200)
@@ -65,4 +81,9 @@ const deleteNotification = asyncHandler(async (req, res) => {
     throw new Error("Invalid Email or Password");
   }
 });
-module.exports = { createNotification, deleteNotification, getNotification };
+module.exports = {
+  createNotification,
+  deleteNotification,
+  getNotification,
+  changeStatus,
+};

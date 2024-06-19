@@ -50,7 +50,7 @@ const changeStatus = asyncHandler(async (req, res) => {
       return x.imageId == imageUrl;
     });
     gallery.images.at(index).status = status;
-    gallery.save();
+    await gallery.save();
     res.json(200);
   } catch (err) {
     res.json(400);

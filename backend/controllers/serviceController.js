@@ -47,7 +47,20 @@ const getServices = asyncHandler(async (req, res) => {
     console.log(err);
   }
 });
+const changeStatus = asyncHandler(async (req, res) => {
+  try {
+    const { index, emailId, status } = req.body.params;
 
+    let service = await Service.findOne({ emailId: emailId });
+
+    service.services.at(index).status = status;
+    await service.save();
+    res.json(200);
+  } catch (err) {
+    res.json(400);
+    throw new Error(err.message);
+  }
+});
 const deleteService = asyncHandler(async (req, res) => {
   const { serviceId, emailId } = req.body;
   try {
@@ -64,4 +77,4 @@ const deleteService = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createService, getServices, deleteService };
+module.exports = { createService, getServices, deleteService, changeStatus };

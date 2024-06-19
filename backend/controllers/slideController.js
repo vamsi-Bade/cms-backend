@@ -58,7 +58,7 @@ const changeStatus = asyncHandler(async (req, res) => {
       return x.imageId == imageUrl;
     });
     slide.images.at(index).status = status;
-    slide.save();
+    await slide.save();
     res.json(200);
   } catch (err) {
     res.json(400);
