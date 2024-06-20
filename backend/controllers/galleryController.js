@@ -60,8 +60,8 @@ const changeStatus = asyncHandler(async (req, res) => {
 });
 const getGallerys = asyncHandler(async (req, res) => {
   try {
-    const { companyName } = req.query;
-    const user = await User.findOne({ companyName: companyName });
+    const { url } = req.query;
+    const user = await User.findOne({ url: url });
     const email = user.email;
     Gallery.findOne({ emailId: email }).then((gallery) => res.json(gallery));
   } catch (error) {

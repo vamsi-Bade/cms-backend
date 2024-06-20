@@ -42,8 +42,8 @@ const createSlide = asyncHandler(async (req, res) => {
 
 const getSlides = asyncHandler(async (req, res) => {
   try {
-    const { companyName } = req.query;
-    const user = await User.findOne({ companyName: companyName });
+    const { url } = req.query;
+    const user = await User.findOne({ url: url });
     const emailId = user.email;
     Slide.findOne({ emailId: emailId }).then((slides) => res.json(slides));
   } catch (error) {

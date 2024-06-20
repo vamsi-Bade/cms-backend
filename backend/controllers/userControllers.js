@@ -22,7 +22,7 @@ const allUsers = asyncHandler(async (req, res) => {
 //@route           POST /api/user/
 //@access          Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, pic, companyName, phone } = req.body;
+  const { name, email, password, pic, companyName, phone, url } = req.body;
 
   if (!name || !email || !password || !companyName || !phone) {
     res.status(400);
@@ -30,12 +30,12 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const userExists = await User.findOne({
-    companyName: companyName.toLowerCase(),
+    url: url.toLowerCase(),
   });
 
-  if (userExists) {
+  if (userExists && email !== userExists.email) {
     res.status(400);
-    throw new Error("User already exists in this company Try another company.");
+    throw new Error("User already exists with this url Try another company.");
   }
   const user = await User.create({
     name: name,
@@ -46,6 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
     phone: phone,
     status: "active",
     role: "user",
+    url: url,
   });
 
   if (user) {
@@ -86,6 +87,7 @@ const authUser = asyncHandler(async (req, res) => {
       pic: user.pic,
       token: generateToken(user._id),
       role: user.role,
+      url: user.url,
     });
   } else {
     res.status(401).send("Invalid Email or Password");
@@ -104,15 +106,14 @@ const getUsers = asyncHandler(async (req, res) => {
 
 const editUser = asyncHandler(async (req, res) => {
   try {
-    const { name, emailId, phone, status, role, companyName, password } =
+    const { name, emailId, phone, status, role, companyName, url, password } =
       req.body.params;
     const user = await User.findOne({ email: emailId });
-    if (companyName.toLowerCase() != user.companyName.toLowerCase()) {
+    if (url.toLowerCase() != user.url.toLowerCase()) {
       const userExists = await User.findOne({
-        companyName: companyName.toLowerCase(),
+        url: url,
       });
-
-      if (userExists) {
+      if (userExists && emailId !== userExists.email) {
         res.status(400);
         throw new Error(
           "User already exists in this company Try another company."
@@ -125,7 +126,7 @@ const editUser = asyncHandler(async (req, res) => {
     user.role = role;
     user.email = emailId;
     user.companyName = companyName.toLowerCase();
-
+    user.url = url;
     if (password) {
       user.password = password;
     }
@@ -136,4 +137,26 @@ const editUser = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
-module.exports = { allUsers, registerUser, authUser, getUsers, editUser };
+
+const checkURL = asyncHandler(async (req, res) => {
+  try {
+    const { url, email } = req.query;
+    const userExists = await User.findOne({ url: url });
+    if (email !== userExists.email && userExists) {
+      res.status(201).send({ exists: true });
+    } else {
+      res.status(201).send({ exists: false });
+    }
+  } catch (err) {
+    res.json(400).send("Error occured");
+    throw new Error(err);
+  }
+});
+module.exports = {
+  allUsers,
+  registerUser,
+  authUser,
+  getUsers,
+  editUser,
+  checkURL,
+};

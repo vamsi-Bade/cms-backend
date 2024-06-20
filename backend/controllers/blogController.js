@@ -58,8 +58,8 @@ const changeStatus = asyncHandler(async (req, res) => {
   }
 });
 const getBlogs = asyncHandler(async (req, res) => {
-  const { companyName } = req.query;
-  const user = await User.findOne({ companyName: companyName });
+  const { url } = req.query;
+  const user = await User.findOne({ url: url });
   const emailId = user.email;
   try {
     Blog.findOne({ emailId: emailId }).then((blog) => res.json(blog));

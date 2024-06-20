@@ -58,8 +58,8 @@ const changeStatus = asyncHandler(async (req, res) => {
 });
 
 const getNotification = asyncHandler(async (req, res) => {
-  const { companyName } = req.query;
-  const user = await User.findOne({ companyName: companyName });
+  const { url } = req.query;
+  const user = await User.findOne({ url: url });
   const emailId = user.email;
   try {
     Notification.findOne({ emailId: emailId }).then((notification) =>

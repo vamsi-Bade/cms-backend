@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema(
     companyName: { type: "String", required: true },
     phone: { type: "String", required: true },
     status: { type: "String", required: true },
+    url: { type: "String", required: true },
     pic: {
       type: "String",
       default:

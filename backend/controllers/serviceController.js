@@ -41,8 +41,8 @@ const createService = asyncHandler(async (req, res) => {
 });
 
 const getServices = asyncHandler(async (req, res) => {
-  const { companyName } = req.query;
-  const user = await User.findOne({ companyName: companyName });
+  const { url } = req.query;
+  const user = await User.findOne({ url: url });
   const emailId = user.email;
   try {
     Service.findOne({ emailId: emailId }).then((service) => res.json(service));
