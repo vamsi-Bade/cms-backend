@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 
 const About = require("../models/aboutModel.js");
+const User = require("../models/userModel.js");
 
 const createAbout = asyncHandler(async (req, res) => {
   const {
@@ -61,7 +62,9 @@ const createAbout = asyncHandler(async (req, res) => {
 });
 
 const getAbouts = asyncHandler(async (req, res) => {
-  const email = req.query.email;
+  const { companyName } = req.query;
+  const user = await User.findOne({ companyName: companyName });
+  const email = user.email;
   try {
     About.findOne({ emailId: email }).then((about) => res.json(about));
   } catch (err) {

@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 
 const Slide = require("../models/slideModel");
+const User = require("../models/userModel");
 
 const createSlide = asyncHandler(async (req, res) => {
   const images = req.body;
@@ -41,8 +42,10 @@ const createSlide = asyncHandler(async (req, res) => {
 
 const getSlides = asyncHandler(async (req, res) => {
   try {
-    const email = req.query.email;
-    Slide.findOne({ emailId: email }).then((slides) => res.json(slides));
+    const { companyName } = req.query;
+    const user = await User.findOne({ companyName: companyName });
+    const emailId = user.email;
+    Slide.findOne({ emailId: emailId }).then((slides) => res.json(slides));
   } catch (error) {
     res.status(400);
     throw new Error(error.message);

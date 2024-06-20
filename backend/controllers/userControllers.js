@@ -29,18 +29,20 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Please Enter all the Feilds");
   }
 
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({
+    companyName: companyName.toLowerCase(),
+  });
 
   if (userExists) {
     res.status(400);
-    throw new Error("User already exists");
+    throw new Error("User already exists in this company Try another company.");
   }
   const user = await User.create({
     name: name,
     email: email,
     password: password,
     pic: pic,
-    companyName: companyName,
+    companyName: companyName.toLowerCase(),
     phone: phone,
     status: "active",
     role: "user",
@@ -59,7 +61,7 @@ const registerUser = asyncHandler(async (req, res) => {
       token: generateToken(user._id),
     });
   } else {
-    res.status(400);
+    res.status(400).send("User Aldready Exists");
     throw new Error("User not found");
   }
 });
@@ -104,14 +106,25 @@ const editUser = asyncHandler(async (req, res) => {
   try {
     const { name, emailId, phone, status, role, companyName, password } =
       req.body.params;
-
     const user = await User.findOne({ email: emailId });
+    if (companyName.toLowerCase() != user.companyName.toLowerCase()) {
+      const userExists = await User.findOne({
+        companyName: companyName.toLowerCase(),
+      });
+
+      if (userExists) {
+        res.status(400);
+        throw new Error(
+          "User already exists in this company Try another company."
+        );
+      }
+    }
     user.name = name;
     user.phone = phone;
     user.status = status;
     user.role = role;
     user.email = emailId;
-    user.companyName = companyName;
+    user.companyName = companyName.toLowerCase();
 
     if (password) {
       user.password = password;

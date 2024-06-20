@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 
 const Gallery = require("../models/galleryModel");
+const User = require("../models/userModel");
 
 const createGallery = asyncHandler(async (req, res) => {
   console.log(req);
@@ -59,7 +60,9 @@ const changeStatus = asyncHandler(async (req, res) => {
 });
 const getGallerys = asyncHandler(async (req, res) => {
   try {
-    const email = req.query.email;
+    const { companyName } = req.query;
+    const user = await User.findOne({ companyName: companyName });
+    const email = user.email;
     Gallery.findOne({ emailId: email }).then((gallery) => res.json(gallery));
   } catch (error) {
     res.status(400);

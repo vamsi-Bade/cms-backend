@@ -1,5 +1,6 @@
 const Notification = require("../models/notificationModel");
 const asyncHandler = require("express-async-handler");
+const User = require("../models/userModel");
 //@description     Fetch all notifications for a user
 //@route           GET /api/notification
 //@access          Protected
@@ -57,7 +58,9 @@ const changeStatus = asyncHandler(async (req, res) => {
 });
 
 const getNotification = asyncHandler(async (req, res) => {
-  const emailId = req.query.emailId;
+  const { companyName } = req.query;
+  const user = await User.findOne({ companyName: companyName });
+  const emailId = user.email;
   try {
     Notification.findOne({ emailId: emailId }).then((notification) =>
       res.json(notification)

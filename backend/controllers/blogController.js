@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 
 const Blog = require("../models/blogModel.js");
+const User = require("../models/userModel.js");
 
 const createBlog = asyncHandler(async (req, res) => {
   const { blogTitle, blogContent, imageId, emailId, shortDesc, status } =
@@ -57,7 +58,9 @@ const changeStatus = asyncHandler(async (req, res) => {
   }
 });
 const getBlogs = asyncHandler(async (req, res) => {
-  const emailId = req.query.emailId;
+  const { companyName } = req.query;
+  const user = await User.findOne({ companyName: companyName });
+  const emailId = user.email;
   try {
     Blog.findOne({ emailId: emailId }).then((blog) => res.json(blog));
   } catch (err) {
