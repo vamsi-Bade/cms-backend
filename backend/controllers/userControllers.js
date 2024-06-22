@@ -97,7 +97,7 @@ const authUser = asyncHandler(async (req, res) => {
 
 const getUsers = asyncHandler(async (req, res) => {
   try {
-    User.find({}).then((users) => res.json(users));
+    await User.find({}).then((users) => res.json(users));
   } catch (err) {
     res.status(400);
     throw new Error(error.message);
