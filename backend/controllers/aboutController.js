@@ -12,6 +12,7 @@ const createAbout = asyncHandler(async (req, res) => {
     address,
     currentContent,
     mapURL,
+    aboutImage,
   } = req.body;
   const userEmail = req.body.user.email;
   if (
@@ -20,13 +21,14 @@ const createAbout = asyncHandler(async (req, res) => {
     !email ||
     !address ||
     !mapURL ||
-    !logoImage
+    !logoImage ||
+    !aboutImage
   ) {
     res.status(400);
     throw new Error("Please Enter all the Fields");
   }
   try {
-    About.findOne({ user: req.body.user._id })
+    await About.findOne({ user: req.body.user._id })
       .then((about) => {
         if (about) {
           about.aboutContent = currentContent;
@@ -36,6 +38,7 @@ const createAbout = asyncHandler(async (req, res) => {
           about.address = address;
           about.emailId = userEmail;
           about.mapURL = mapURL;
+          about.aboutImage = aboutImage;
 
           return about.save();
         } else {
@@ -48,6 +51,7 @@ const createAbout = asyncHandler(async (req, res) => {
             address: address,
             emailId: userEmail,
             mapURL: mapURL,
+            aboutImage: aboutImage,
           };
           return About.create(aboutData);
         }

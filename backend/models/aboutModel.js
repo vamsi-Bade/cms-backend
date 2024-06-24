@@ -13,6 +13,12 @@ const aboutModel = mongoose.Schema(
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
+    aboutImage: {
+      type: String,
+      trim: true,
+      default:
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+    },
     address: { type: String, required: true, trim: true },
     mapURL: { type: String, required: true, trim: true },
   },

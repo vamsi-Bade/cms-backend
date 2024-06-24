@@ -8,6 +8,7 @@ const blogRoutes = require("./routes/blogRoutes.js");
 const serviceRoutes = require("./routes/serviceRoutes.js");
 const galleryRoutes = require("./routes/galleryRoutes.js");
 const notificationRoutes = require("./routes/notificationRoutes");
+const colorRoutes = require("./routes/colorRoutes.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const path = require("path");
 const cors = require("cors");
@@ -47,6 +48,7 @@ app.use("/api/slides", slideRoutes);
 app.use("/api/blog", blogRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/gallery", galleryRoutes);
+app.use("/api/color", colorRoutes);
 
 // --------------------------deployment------------------------------
 
